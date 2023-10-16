@@ -1,5 +1,7 @@
-README.md
+challengereadme.md
 Assets
 Assets/21-mern-homework-demo-01.gif
 Assets/21-mern-homework-demo-02.gif
 Assets/21-mern-homework-demo-03.gif
+node_modules
+package-lock.json
