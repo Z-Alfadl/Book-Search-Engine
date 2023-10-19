@@ -46,15 +46,15 @@ const resolvers = {
       //return user data and token
       return { token, user };
     },
-    //saveBook
-    saveBook: async (parent, { input }, context) => {
+    //saveBook, saved by Angelin again
+    saveBook: async (parent, { book }, context) => {
       //check if user is logged in by checking if context has a user field
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           //find user by _id
           { _id: context.user._id },
           //add bookData to the savedBooks array of that user
-          { $addToSet: { savedBooks: input } },
+          { $addToSet: { savedBooks: book } },
           { new: true, runValidators: true }
         );
         return updatedUser;
@@ -62,14 +62,14 @@ const resolvers = {
       //if not logged in, throw error
       throw new AuthenticationError("You must be logged in to save books");
     },
-    removeBook: async (parent, { bookData }, context) => {
+    removeBook: async (parent, { bookId}, context) => {
       //check if user is logged in
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           //find user by _id
           { _id: context.user._id },
           //Pull book from savedBooks array by its id
-          { $pull: { savedBooks: { bookId: bookData } } },
+          { $pull: { savedBooks: { bookId: bookId } } },
           { new: true }
         );
         return updatedUser;

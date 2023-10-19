@@ -9,22 +9,17 @@ import {
 } from 'react-bootstrap';
 
 //importing useMutation hook and SAVE_BOOK mutation
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation} from '@apollo/client'
 import {SAVE_BOOK } from '../utils/mutations'
-import {GET_ME} from '../utils/queries'
 import Auth from '../utils/auth';
-import {searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 
 
 
 const SearchBooks = () => {
-  const { loading, data } = useQuery(GET_ME);
-  const userData = data?.me || {};
-
   //create mutation
-  const [saveBook, { error}] = useMutation(SAVE_BOOK);
+  const [saveBook, { error }] = useMutation(SAVE_BOOK);
 
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
@@ -49,7 +44,9 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await searchGoogleBooks(searchInput);
+      const response = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=${searchInput}`
+      );
 
       if (!response.ok) {
         throw new Error('something went wrong!');
@@ -76,7 +73,6 @@ const SearchBooks = () => {
   const handleSaveBook = async (bookId) => {
     // find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -85,11 +81,10 @@ const SearchBooks = () => {
     }
 
     try {
+      //Credit To Angelin Rajan
       const { data } = await saveBook({
-        variables: {...bookToSave}
+        variables: {book: bookToSave}
       });
-      console.log({data})
-      console.log(bookToSave)
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
